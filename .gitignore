@@ -1,3 +1,5 @@
+
+
 *.class
 
 # Mobile Tools for Java (J2ME)
@@ -12,3 +14,4 @@
 hs_err_pid*
 /24hDuCode2015/nbproject/private/
 /build/
+/nbproject/

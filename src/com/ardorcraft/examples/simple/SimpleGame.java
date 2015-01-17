@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-
+package com.ardorcraft.examples.simple;
 
 import java.net.URISyntaxException;
 

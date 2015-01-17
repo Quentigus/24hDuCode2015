@@ -1,5 +1,5 @@
 
-
+package com.ardorcraft.examples.simple;
 
 import com.ardorcraft.base.ArdorBaseApplication;
 
