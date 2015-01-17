@@ -10,7 +10,6 @@
 
 package fr.labycraft;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 
@@ -52,8 +51,6 @@ import com.ardorcraft.collision.IntersectionResult;
 import com.ardorcraft.data.Pos;
 import com.ardorcraft.examples.thegame.SelectDialog;
 import com.ardorcraft.generators.DataGenerator;
-import com.ardorcraft.network.LocalServerConnection;
-import com.ardorcraft.network.LocalServerDataHandler;
 import com.ardorcraft.objects.QuadBox;
 import com.ardorcraft.objects.SkyDome;
 import com.ardorcraft.player.PlayerWithPhysics;
@@ -64,13 +61,14 @@ import com.ardorcraft.world.BlockWorld;
 import com.ardorcraft.world.IServerConnection;
 import com.ardorcraft.world.WorldSettings;
 import fr.labycraft.generators.LabyrintheGenerator;
+import fr.labycraft.network.GameLocalServerConnection;
+import fr.labycraft.network.GameServerDataHandler;
 
 /**
  * A bigger example that will grow over time...
  */
 public class Game implements ArdorCraftGame {
 
-    private DataGenerator dataGenerator = new LabyrintheGenerator();
     private BlockWorld blockWorld;
     private final int tileSize = 16;
     private final int height = 150;
@@ -158,7 +156,6 @@ public class Game implements ArdorCraftGame {
         
         final String texture = dialog.getSelectedTexture();
         final int textureTileSize = dialog.getSelectedTextureSize();
-        final boolean doOverwriteMap = true;//dialog.getIsOverwriteMap();
         final int gridSize = dialog.getViewDistance();
 
         farPlane = (gridSize - 1) / 2 * tileSize;
@@ -168,17 +165,10 @@ public class Game implements ArdorCraftGame {
 
         // Create player object
         player = new PlayerWithPhysics(logicalLayer);
-        player.getPosition().set(15, 50, 15);
+        player.getPosition().set(0, 0, 0);
         player.setWalking(true);
 
         registerTriggers(logicalLayer, mouseManager);
-
-        /*// Map file to use
-        final File worldFileSource = new File(dialog.getSelectedGenerator().getSimpleName() + "_Map.acr");
-        // Uncomment this if you want to start your mapfile from scratch each run...
-        if (doOverwriteMap && worldFileSource.exists()) {
-            worldFileSource.delete();
-        }*/
 
         // Create main blockworld handler
         final WorldSettings settings = new WorldSettings();
@@ -193,8 +183,7 @@ public class Game implements ArdorCraftGame {
         settings.setTileHeight(height);
         settings.setGridSize(gridSize);
 
-        final IServerConnection serverConnection = new LocalServerConnection(new LocalServerDataHandler(tileSize,
-                height, gridSize, dataGenerator, null));
+        final IServerConnection serverConnection = new GameLocalServerConnection(new GameServerDataHandler(tileSize, height, gridSize, new LabyrintheGenerator(), null));
         settings.setServerConnection(serverConnection);
 
         blockWorld = new BlockWorld(settings);
