@@ -1,5 +1,6 @@
 package fr.labycraft.Modele;
 
+import java.awt.Point;
 import java.util.Arrays;
 import java.io.PrintStream;
 import java.util.Random;
@@ -10,9 +11,14 @@ import java.util.Random;
  *
  */
 public abstract class MazeGenerator {
+	
+	public int safeWidth;
+	public int safeHeigth;
 
 	public static void main(String[] args) {
-		MazeGenerator maze = new Labyrinthe(50, 50);
+		MazeGenerator maze = new Labyrinthe(12, 10);
+		maze.carveSafeZone(4, 8);
+		maze.print(System.out);
 		maze.generate();
 		maze.print(System.out);
 		maze.printBoolean();
@@ -45,13 +51,54 @@ public abstract class MazeGenerator {
 		mazeBool[generateRandIndLargeur()][0] = 0;
 		mazeBool[mazeBool.length / 2][mazeBool[0].length - 1] = 0;
 	}
-	private int generateRandIndLargeur(){
-		 int ind = new Random().nextInt(mazeBool.length - 3) + 2;
-		if((ind % 2) == 0){
+
+	private int generateRandIndLargeur() {
+		int ind = new Random().nextInt(mazeBool.length - 3) + 2;
+		if ((ind % 2) == 0) {
 			ind--;
 		}
 		System.out.println(ind);
 		return ind;
+	}
+
+	private void carveSafeZone(int safeWidth, int safeHeigth) {
+		Point topLeft = new Point();
+		Point topRight = new Point();
+		Point bottomLeft = new Point();
+		Point bottomRight = new Point();
+
+		this.safeWidth = safeWidth;
+		this.safeHeigth = safeHeigth;
+		
+		topLeft.setLocation((width / 2) - (safeWidth / 2), (height / 2) - safeHeigth / 2);
+		System.out.println(topLeft);
+
+		topRight.setLocation(((width / 2) + (safeWidth / 2)) - 1, (height / 2) - safeHeigth / 2);
+		System.out.println(topRight);
+
+		bottomLeft.setLocation((width / 2) - (safeWidth / 2), ((height / 2) + safeHeigth / 2) - 1);
+		System.out.println(bottomLeft);
+
+		bottomRight.setLocation(((width / 2) + (safeWidth / 2) - 1), ((height / 2) + safeHeigth / 2) - 1);
+		System.out.println(bottomRight);
+
+		int y = (int) topLeft.getY();
+
+		while (y <= bottomLeft.getY()) {
+
+			int x = (int) topLeft.getX();
+			while (x <= topRight.getX()) {
+				System.out.println("x : " + x + " - y : " + y);
+				if (x != topRight.getX()) {
+					carve(x, y, RIGHT);
+				}
+				if (y != bottomLeft.getY()) {
+					carve(x, y, DOWN);
+				}
+				x++;
+			}
+			y++;
+		}
 	}
 
 	/**
@@ -120,7 +167,6 @@ public abstract class MazeGenerator {
 	 * {@link #reset()}.
 	 */
 	public final void generate() {
-		reset();
 		generateMaze();
 		convertToBoolean();
 		percerEntreeSortieBool();
