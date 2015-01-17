@@ -49,7 +49,6 @@ public abstract class MazeGenerator {
 
 	private void percerEntreeSortieBool() {
 		mazeBool[generateRandIndLargeur()][0] = 0;
-		mazeBool[mazeBool.length / 2][mazeBool[0].length - 1] = 0;
 	}
 
 	private int generateRandIndLargeur() {
@@ -57,7 +56,6 @@ public abstract class MazeGenerator {
 		if ((ind % 2) == 0) {
 			ind--;
 		}
-		System.out.println(ind);
 		return ind;
 	}
 
@@ -71,16 +69,12 @@ public abstract class MazeGenerator {
 		this.safeHeigth = safeHeigth;
 		
 		topLeft.setLocation((width / 2) - (safeWidth / 2), (height / 2) - safeHeigth / 2);
-		System.out.println(topLeft);
 
 		topRight.setLocation(((width / 2) + (safeWidth / 2)) - 1, (height / 2) - safeHeigth / 2);
-		System.out.println(topRight);
 
 		bottomLeft.setLocation((width / 2) - (safeWidth / 2), ((height / 2) + safeHeigth / 2) - 1);
-		System.out.println(bottomLeft);
 
 		bottomRight.setLocation(((width / 2) + (safeWidth / 2) - 1), ((height / 2) + safeHeigth / 2) - 1);
-		System.out.println(bottomRight);
 
 		int y = (int) topLeft.getY();
 
@@ -88,7 +82,6 @@ public abstract class MazeGenerator {
 
 			int x = (int) topLeft.getX();
 			while (x <= topRight.getX()) {
-				System.out.println("x : " + x + " - y : " + y);
 				if (x != topRight.getX()) {
 					carve(x, y, RIGHT);
 				}
