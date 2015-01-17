@@ -52,6 +52,7 @@ import com.ardorcraft.collision.IntersectionResult;
 import com.ardorcraft.data.Pos;
 import com.ardorcraft.examples.thegame.SelectDialog;
 import com.ardorcraft.generators.DataGenerator;
+import com.ardorcraft.generators.LabyrintheGenerator;
 import com.ardorcraft.generators.NiceDataGenerator;
 import com.ardorcraft.network.LocalServerConnection;
 import com.ardorcraft.network.LocalServerDataHandler;
@@ -70,7 +71,7 @@ import com.ardorcraft.world.WorldSettings;
  */
 public class Game implements ArdorCraftGame {
 
-    private DataGenerator dataGenerator = new NiceDataGenerator();
+	private DataGenerator dataGenerator = new LabyrintheGenerator();
     private BlockWorld blockWorld;
     private final int tileSize = 16;
     private final int height = 150;
