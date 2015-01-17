@@ -130,7 +130,7 @@ public class SimpleGame implements ArdorCraftGame {
     private final LayerDataGenerator simpleSineGenerator = new LayerDataGenerator(1, 5) {
         @Override
         public boolean isCave(final int x, final int y, final int z, final WorldModifier blockScene) {
-            return y > 10 && y < 15;
+            return y > 1 && y < 15;
         }
 
         @Override
