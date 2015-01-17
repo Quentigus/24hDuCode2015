@@ -64,13 +64,14 @@ import com.ardorcraft.world.BlockType;
 import com.ardorcraft.world.BlockWorld;
 import com.ardorcraft.world.IServerConnection;
 import com.ardorcraft.world.WorldSettings;
+import fr.labycraft.generators.LabyrintheGenerator;
 
 /**
  * A bigger example that will grow over time...
  */
 public class Game implements ArdorCraftGame {
 
-    private DataGenerator dataGenerator = new NiceDataGenerator();
+    private DataGenerator dataGenerator = new LabyrintheGenerator();
     private BlockWorld blockWorld;
     private final int tileSize = 16;
     private final int height = 150;
@@ -149,7 +150,7 @@ public class Game implements ArdorCraftGame {
             ex.printStackTrace();
         }
 
-        canvas.setTitle("ArdorCraft API Example - RealGame.java");
+        canvas.setTitle("Les Titouz 3.0");
 
         final SelectDialog dialog = new SelectDialog();
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -158,7 +159,7 @@ public class Game implements ArdorCraftGame {
         
         final String texture = dialog.getSelectedTexture();
         final int textureTileSize = dialog.getSelectedTextureSize();
-        final boolean doOverwriteMap = dialog.getIsOverwriteMap();
+        final boolean doOverwriteMap = true;//dialog.getIsOverwriteMap();
         final int gridSize = dialog.getViewDistance();
 
         farPlane = (gridSize - 1) / 2 * tileSize;
@@ -173,12 +174,12 @@ public class Game implements ArdorCraftGame {
 
         registerTriggers(logicalLayer, mouseManager);
 
-        // Map file to use
+        /*// Map file to use
         final File worldFileSource = new File(dialog.getSelectedGenerator().getSimpleName() + "_Map.acr");
         // Uncomment this if you want to start your mapfile from scratch each run...
         if (doOverwriteMap && worldFileSource.exists()) {
             worldFileSource.delete();
-        }
+        }*/
 
         // Create main blockworld handler
         final WorldSettings settings = new WorldSettings();
@@ -194,7 +195,7 @@ public class Game implements ArdorCraftGame {
         settings.setGridSize(gridSize);
 
         final IServerConnection serverConnection = new LocalServerConnection(new LocalServerDataHandler(tileSize,
-                height, gridSize, dataGenerator, worldFileSource));
+                height, gridSize, dataGenerator, null));
         settings.setServerConnection(serverConnection);
 
         blockWorld = new BlockWorld(settings);

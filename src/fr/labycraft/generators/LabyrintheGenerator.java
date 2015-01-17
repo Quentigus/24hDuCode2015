@@ -1,5 +1,6 @@
-package com.ardorcraft.generators;
+package fr.labycraft.generators;
 
+import com.ardorcraft.generators.DataGenerator;
 import com.ardorcraft.world.WorldModifier;
 
 /**

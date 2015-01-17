@@ -1,7 +1,8 @@
 
-package com.ardorcraft.generators;
+package fr.labycraft;
 
 import fr.labycraft.generators.LabyrintheGenerator;
+import com.ardorcraft.generators.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -37,11 +38,11 @@ import com.ardorcraft.world.WorldModifier;
  * Use this to play around more easily with your terrain generators.
  * 
  */
-public class GeneratorViewer {
-    private static final Logger logger = Logger.getLogger(GeneratorViewer.class.getName());
+public class GameGeneratorViewer {
+    private static final Logger logger = Logger.getLogger(GameGeneratorViewer.class.getName());
 
     public static void main(final String[] args) {
-		new GeneratorViewer(new LabyrintheGenerator() , 32, 150, 16);
+		new GameGeneratorViewer(new LabyrintheGenerator() , 32, 150, 16);
     }
 
     private int spacing = 1;
@@ -82,7 +83,7 @@ public class GeneratorViewer {
         }
     };
 
-    public GeneratorViewer(final DataGenerator generator, final int chunkWidth, final int chunkHeight,
+    public GameGeneratorViewer(final DataGenerator generator, final int chunkWidth, final int chunkHeight,
             final int gridSize) {
         this.generator = generator;
         this.chunkWidth = chunkWidth;
