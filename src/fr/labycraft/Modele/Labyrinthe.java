@@ -2,6 +2,7 @@ package fr.labycraft.Modele;
 
  
 import fr.labycraft.Modele.MazeGenerator;
+import java.awt.Point;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -27,6 +28,8 @@ public class Labyrinthe extends MazeGenerator {
 
         this.startX = rand.nextInt(width);
         this.startY = rand.nextInt(height);
+		
+		reset();
     }
 
     /**
@@ -51,6 +54,7 @@ public class Labyrinthe extends MazeGenerator {
     private static final int IN       = 0;
     private static final int FRONTIER = 1;
     private static final int OUT      = 2;
+    private static final int SAFE      = 2;
 
     /**
      * Generate the maze.
@@ -62,12 +66,45 @@ public class Labyrinthe extends MazeGenerator {
         int[] cells = new int[width * height];  // States
         Arrays.fill(cells, OUT);
         int[] frontierCells = new int[width * height];
-
+		
+		Point topLeft = new Point();
+		Point topRight = new Point();
+		Point bottomLeft = new Point();
+		Point bottomRight = new Point();
+		
         // Start cell
         // Make all its neighbours FRONTIER
 
+		topLeft.setLocation((width / 2) - (safeWidth / 2), (height / 2) - safeHeigth / 2);
+		System.out.println(topLeft);
+
+		topRight.setLocation(((width / 2) + (safeWidth / 2)) - 1, (height / 2) - safeHeigth / 2);
+		System.out.println(topRight);
+
+		bottomLeft.setLocation((width / 2) - (safeWidth / 2), ((height / 2) + safeHeigth / 2) - 1);
+		System.out.println(bottomLeft);
+
+		bottomRight.setLocation(((width / 2) + (safeWidth / 2) - 1), ((height / 2) + safeHeigth / 2) - 1);
+		System.out.println(bottomRight);
+
+		int y2 = (int) topLeft.getY();
+
+		while (y2 < bottomLeft.getY()) {
+
+			int x = (int) topLeft.getX();
+			while (x < topRight.getX()) {
+				cells[y2*width + x] = IN;
+				System.out.println(x + " " + y2 + " SAFE");
+				x++;
+			}
+			y2++;
+		}
+		
         cells[startY*width + startX] = IN;
+		
+		
         int frontierCount = 0;
+		print(cells);
         for (int i = 0; i < 4; i++) {
             switch (i) {
                 case UP:
@@ -192,4 +229,7 @@ public class Labyrinthe extends MazeGenerator {
     public String toString() {
         return "Prim's Algorithm maze generator";
     }
+
+	private void print(int[] cells) {
+	}
 }

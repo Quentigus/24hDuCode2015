@@ -15,35 +15,60 @@ import java.util.Random;
  */
 public class LabyrintheGenerator implements DataGenerator{
 
+    
     private static final int waterHeight = 0;
-
-    private boolean[][] tab = {
-        {true, true, true},
-        {true, false, true},
-        {true, true, true}
-    };
+    
+    private int[][] tab = new int[50][50];
     
     @Override
     public void generateChunk(int xStart, int zStart, int xEnd, int zEnd, int spacing, int height, WorldModifier proxy) {
-        
+        safeZone();
         for (int x = xStart;x < xEnd;x++) {
             for (int y = zStart;y < zEnd;y++) {
                 
                 if (x >= 0 && x < tab.length
                         &&y >= 0 && y < tab[0].length) {
                     int z = 0;
-                    if (tab[x][y]) { z = 2; }
-                    proxy.setBlock(x, z, y, 2);
+                    if (tab[x][y] == 1) {
+                        for(int k = 1;k<10;k++){
+                            proxy.setBlock(x, k, y, 1);
+                        }
+                    }
+                    if (tab[x][y] == 2) {
+                        proxy.setBlock(x, 1, y, 2);
+                    }
+                    if (tab[x][y] == 3) {
+                        
+                        //for (int k = 0; k < 5; k++) {
+                         //   proxy.setBlock(x, k, y, 17);
+                        //}
+                        Pos p = new Pos(x, 0, y);
+                        Random rand = new Random();
+                        addTree(proxy, p, 20, rand);
+                    }
                 }
-            }   
+            }
         }
     }
-
+    
+    private void safeZone(){
+        for (int i = 0; i<50;i++){
+            for (int j = 0;j<50;j++){
+                if (i == 0 || j == 0 || i == 49 || j == 49){
+                    tab[i][j] = 1;
+                }else{
+                    tab[i][j] = 2;
+                }
+                tab[25][25] = 3;
+            }
+        }
+    }
+    
     private void addTree(final WorldModifier blockScene, final Pos pos, final int treeHeight, final Random rand) {
         for (int y = 0; y < treeHeight; y++) {
             blockScene.setBlock(pos.x, pos.y + y, pos.z, 17);
         }
-
+        
         for (int x = 0; x < treeHeight; x++) {
             for (int z = 0; z < treeHeight; z++) {
                 for (int y = 0; y < treeHeight; y++) {
@@ -63,20 +88,20 @@ public class LabyrintheGenerator implements DataGenerator{
             }
         }
     }
-
+    
     private void generateColumn(final int x, final int z, final int height, final WorldModifier blockScene,
-        final int xStart, final int zStart, final int xEnd, final int zEnd, final List<Pos> treePositions,
-        final List<Integer> treeHeights, final Random rand) {
+            final int xStart, final int zStart, final int xEnd, final int zEnd, final List<Pos> treePositions,
+            final List<Integer> treeHeights, final Random rand) {
         final double gen = 5;
-
+        
         int localHeight = 0;
-
+        
         localHeight = generateLayer(x, z, gen + 0, 0.1, 0, 0.4f * height, 7, 0.2f, height, blockScene, rand);
         localHeight = generateLayer(x, z, gen + 0.2, 1.5, localHeight, 0.08f * height + 1.5f * (localHeight - 10), 1,
                 0.8f, height, blockScene, rand);
         localHeight = generateLayer(x, z, gen + 0.5, 2.0, localHeight, 0.06f * height + 0.3f * (localHeight - 5), 3,
                 0.6f, height, blockScene, rand);
-
+        
         // mountain
         final double noise1 = ImprovedNoise.noise(x * 0.01, 20, z * 0.01) + 0.5;
         final double noise3 = ImprovedNoise.noise(x * 0.05, 20, z * 0.05) + 0.5;
@@ -104,7 +129,7 @@ public class LabyrintheGenerator implements DataGenerator{
             }
         }
         localHeight += val;
-
+        
         // sediment
         final int block = blockScene.getBlock(x, localHeight - 1, z);
         if (block == 3) {
@@ -114,14 +139,14 @@ public class LabyrintheGenerator implements DataGenerator{
                 blockScene.setBlock(x, localHeight - 1, z, 2);
                 final boolean addedTree = checkAddTree(x, z, xStart, zStart, xEnd, zEnd, localHeight, treePositions,
                         treeHeights, rand);
-
+                
                 final double noiseVegetation = ImprovedNoise.noise(x * 0.5, 0, z * 0.5) * Math.abs(noise3);
                 if (!addedTree && noiseVegetation > (double) (localHeight - waterHeight) / height) {
                     blockScene.setBlock(x, localHeight, z, 100 + MathUtils.rand.nextInt(8));
                     localHeight++;
                 }
             }
-
+            
             if (noise2 < -0.4) {
                 final double noiseTree = ImprovedNoise.noise(x * 0.2, localHeight * 0.2, z * 0.2);
                 if (noiseTree > 0.4) {
@@ -133,13 +158,13 @@ public class LabyrintheGenerator implements DataGenerator{
                 }
             }
         }
-
+        
         if (localHeight < waterHeight) {
             for (; localHeight < waterHeight; localHeight++) {
                 blockScene.setBlock(x, localHeight, z, BlockWorld.WATER);
             }
         }
-
+        
         for (int y = localHeight; y < height; y++) {
             blockScene.setBlock(x, y, z, 0);
         }
@@ -148,11 +173,11 @@ public class LabyrintheGenerator implements DataGenerator{
     private final int[] height = new int[] { 5, 7, 9 };
     
     private boolean checkAddTree(final int x, final int z, final int xStart, final int zStart, final int xEnd,
-        final int zEnd, final int localHeight, final List<Pos> treePositions, final List<Integer> treeHeights,
-        final Random rand) {
+            final int zEnd, final int localHeight, final List<Pos> treePositions, final List<Integer> treeHeights,
+            final Random rand) {
         final int treeHeight = height[rand.nextInt(height.length)];
         final int testHeight = (treeHeight - 1) / 2;
-
+        
         if (x >= xStart + testHeight && x < xEnd - testHeight && z >= zStart + testHeight && z < zEnd - testHeight) {
             final double noiseTree = (ImprovedNoise.noise(x * 0.01, localHeight * 0.005, z * 0.01) + 0.3) * 0.2;
             final double r = rand.nextDouble();
@@ -166,21 +191,21 @@ public class LabyrintheGenerator implements DataGenerator{
     }
     
     private int generateLayer(final int x, final int z, final double noiseVal, final double noiseScale,
-        final int startheight, float layerheight, final int type, final float adder, final int height,
-        final WorldModifier blockScene, final Random rand) {
+            final int startheight, float layerheight, final int type, final float adder, final int height,
+            final WorldModifier blockScene, final Random rand) {
         layerheight = Math.max(0.0f, layerheight);
-
+        
         double noise = ImprovedNoise.noise(x * 0.01 * noiseScale, noiseVal, z * 0.01 * noiseScale) + adder;
         double noise2 = ImprovedNoise.noise(x * 0.05 * noiseScale, noiseVal, z * 0.05 * noiseScale) + adder;
-
+        
         double phatnoise = ImprovedNoise.noise(x * 0.004, noiseVal, z * 0.004);
         phatnoise = MathUtils.clamp(Math.abs(phatnoise) + 0.6, 0.0, 1.0);
         noise2 *= phatnoise;
         noise *= phatnoise;
-
+        
         int localHeight = (int) (noise * layerheight + noise2 * layerheight * 0.35);
         localHeight = Math.max(0, localHeight);
-
+        
         for (int y = startheight; y < startheight + localHeight; y++) {
             if (y <= 1) {
                 blockScene.setBlock(x, y, z, 12);
@@ -209,7 +234,7 @@ public class LabyrintheGenerator implements DataGenerator{
                 }
             }
         }
-
+        
         return startheight + localHeight;
     }
 }
