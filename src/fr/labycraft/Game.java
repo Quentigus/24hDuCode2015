@@ -52,7 +52,6 @@ import com.ardorcraft.collision.IntersectionResult;
 import com.ardorcraft.data.Pos;
 import com.ardorcraft.examples.thegame.SelectDialog;
 import com.ardorcraft.generators.DataGenerator;
-import com.ardorcraft.generators.NiceDataGenerator;
 import com.ardorcraft.network.LocalServerConnection;
 import com.ardorcraft.network.LocalServerDataHandler;
 import com.ardorcraft.objects.QuadBox;
