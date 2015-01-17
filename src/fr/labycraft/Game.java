@@ -50,7 +50,6 @@ import com.ardorcraft.base.CanvasRelayer;
 import com.ardorcraft.collision.IntersectionResult;
 import com.ardorcraft.data.Pos;
 import com.ardorcraft.examples.thegame.SelectDialog;
-import com.ardorcraft.generators.DataGenerator;
 import com.ardorcraft.objects.QuadBox;
 import com.ardorcraft.objects.SkyDome;
 import com.ardorcraft.player.PlayerWithPhysics;
@@ -63,12 +62,20 @@ import com.ardorcraft.world.WorldSettings;
 import fr.labycraft.generators.LabyrintheGenerator;
 import fr.labycraft.network.GameLocalServerConnection;
 import fr.labycraft.network.GameServerDataHandler;
+import java.util.Date;
 
 /**
  * A bigger example that will grow over time...
  */
 public class Game implements ArdorCraftGame {
 
+    private float globalLight = 1f;
+    private final float minLight = .2f;
+    private final float maxLight = 1f;
+    private final long cycle = 100;
+    private long previousState = 0;
+    private boolean fadingSky = true;
+    
     private BlockWorld blockWorld;
     private final int tileSize = 16;
     private final int height = 150;
@@ -88,13 +95,7 @@ public class Game implements ArdorCraftGame {
     private Node worldNode;
     private SkyDome skyDome;
     private QuadBox selectionBox;
-
-    private int blockType = 1;
-    private float globalLight = 1f;
-    private final int[] blockTypeLookup = new int[] {
-            1, 47, 4, 5, 20, 95, 12, 45, 48, 50
-    };
-
+    
     @Override
     public void update(final ReadOnlyTimer timer) {
         player.update(blockWorld, timer);
@@ -112,11 +113,31 @@ public class Game implements ArdorCraftGame {
 
         skyDome.setTranslation(player.getPosition());
 
-        //updateFog(player.getPosition());
-
         // The infinite world update
         blockWorld.updatePlayer(player.getPosition(), player.getDirection());
         blockWorld.update(timer);
+        
+        long currentState = new Date().getTime();
+                
+        if (this.previousState + this.cycle < currentState) {
+
+            System.out.println("sky");
+            if (this.fadingSky) {
+                 globalLight = (float) Math.max(globalLight - 0.01 * 0.4, minLight);
+                 blockWorld.setGlobalLight(globalLight);
+            }
+            else {
+                 globalLight = (float) Math.min(globalLight + 0.01 * 0.4, maxLight);
+                 blockWorld.setGlobalLight(globalLight);
+            }
+
+            if (globalLight <= minLight || globalLight >= maxLight) {
+                 this.fadingSky = !this.fadingSky;
+            }
+
+            this.previousState = currentState;
+            updateLighting();
+        }
     }
 
     @Override
@@ -133,11 +154,10 @@ public class Game implements ArdorCraftGame {
     }
 
     @Override
-    public void init(final Node root, final CanvasRelayer canvas, final LogicalLayer logicalLayer,
-            final PhysicalLayer physicalLayer, final MouseManager mouseManager) {
+    public void init(final Node root, final CanvasRelayer canvas, final LogicalLayer logicalLayer, final PhysicalLayer physicalLayer, final MouseManager mouseManager) {
         this.root = root;
         this.canvas = canvas;
-
+        
         try {
             final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
                     Game.class, "com/ardorcraft/resources"));
@@ -187,7 +207,7 @@ public class Game implements ArdorCraftGame {
         settings.setServerConnection(serverConnection);
 
         blockWorld = new BlockWorld(settings);
-
+        
         // Set block 45 (brickblock) to be a pyramid drawn with the meshproducer
         final BlockUtil blockUtil = blockWorld.getBlockUtil();
         final int blockId = 45;
