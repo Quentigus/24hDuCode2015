@@ -185,7 +185,7 @@ public class Game implements ArdorCraftGame {
 
         // Create player object
         player = new PlayerWithPhysics(logicalLayer);
-        player.getPosition().set(0, 0, 0);
+        player.getPosition().set(50, 0, 50);
         player.setWalking(true);
 
         registerTriggers(logicalLayer, mouseManager);
