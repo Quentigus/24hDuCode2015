@@ -7,18 +7,24 @@ import com.ardorcraft.util.ImprovedNoise;
 import com.ardorcraft.world.BlockWorld;
 import com.ardorcraft.world.WorldModifier;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Random;
 
 /**
  *
  * @author Bastien Andru <bastien.andru@gmail.com>
  */
-public class LabyrintheGenerator implements DataGenerator{
-
-    
+public class LabyrintheGenerator implements DataGenerator, Observer {
+   
     private static final int waterHeight = 0;
     
     private int[][] tab = new int[50][50];
+
+    @Override
+    public void update(Observable o, Object arg) {
+        System.out.println("génération");
+    }
     
     @Override
     public void generateChunk(int xStart, int zStart, int xEnd, int zEnd, int spacing, int height, WorldModifier proxy) {

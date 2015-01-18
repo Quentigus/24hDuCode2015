@@ -3,17 +3,14 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it 
- * under the terms of its license which may be found in the accompanying
- * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
+ * Ardor3D is free software: you can redistribute it and/or modify it under the
+ * terms of its license which may be found in the accompanying LICENSE file or
+ * at <http://www.ardor3d.com/LICENSE>.
  */
-
 package fr.labycraft;
 
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
-
-import javax.swing.WindowConstants;
 
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.GrabbedState;
@@ -49,7 +46,7 @@ import com.ardorcraft.base.ArdorCraftGame;
 import com.ardorcraft.base.CanvasRelayer;
 import com.ardorcraft.collision.IntersectionResult;
 import com.ardorcraft.data.Pos;
-import com.ardorcraft.examples.thegame.SelectDialog;
+import com.ardorcraft.generators.DataGenerator;
 import com.ardorcraft.objects.QuadBox;
 import com.ardorcraft.objects.SkyDome;
 import com.ardorcraft.player.PlayerWithPhysics;
@@ -67,25 +64,30 @@ import java.util.Date;
 /**
  * A bigger example that will grow over time...
  */
-public class Game implements ArdorCraftGame {
+public class Game extends java.util.Observable implements ArdorCraftGame {
 
+    private final long cycle = 10000;
     private float globalLight = 1f;
     private final float minLight = .2f;
     private final float maxLight = 1f;
-    private final long cycle = 100;
-    private long previousState = 0;
-    private boolean fadingSky = true;
-    
-    private BlockWorld blockWorld;
-    private final int tileSize = 16;
-    private final int height = 150;
-    private double farPlane = 10000.0;
+    private final float nightLimit = .4f;
+    private final boolean showHD = false;
 
-    private final IntersectionResult intersectionResult = new IntersectionResult();
-
-    //private final FogState fogState = new FogState();
     private final ColorRGBA fogColor = new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
     private final ColorRGBA topColor = new ColorRGBA(0.5f, 0.6f, 1.0f, 1.0f);
+
+    private final DataGenerator generator = new LabyrintheGenerator();
+
+    private final int tileSize = 16;
+    private final int gridSize = 20;
+    private final int height = 150;
+
+    private long previousState = 0;
+    private boolean fadingSky = true;
+    private boolean currentlyNight = false;
+
+    private BlockWorld blockWorld;
+    private double farPlane = 10000.0;
 
     private CanvasRelayer canvas;
     private Node root;
@@ -95,7 +97,9 @@ public class Game implements ArdorCraftGame {
     private Node worldNode;
     private SkyDome skyDome;
     private QuadBox selectionBox;
-    
+
+    private final IntersectionResult intersectionResult = new IntersectionResult();
+
     @Override
     public void update(final ReadOnlyTimer timer) {
         player.update(blockWorld, timer);
@@ -116,23 +120,31 @@ public class Game implements ArdorCraftGame {
         // The infinite world update
         blockWorld.updatePlayer(player.getPosition(), player.getDirection());
         blockWorld.update(timer);
-        
-        long currentState = new Date().getTime();
-                
-        if (this.previousState + this.cycle < currentState) {
 
-            System.out.println("sky");
+        long currentState = new Date().getTime();
+
+        if (this.previousState + this.cycle / 80 < currentState) {
+
             if (this.fadingSky) {
-                 globalLight = (float) Math.max(globalLight - 0.01 * 0.4, minLight);
-                 blockWorld.setGlobalLight(globalLight);
-            }
-            else {
-                 globalLight = (float) Math.min(globalLight + 0.01 * 0.4, maxLight);
-                 blockWorld.setGlobalLight(globalLight);
+                globalLight = (float) Math.max(globalLight - 0.01 * 0.4, minLight);
+                blockWorld.setGlobalLight(globalLight);
+            } else {
+                globalLight = (float) Math.min(globalLight + 0.01 * 0.4, maxLight);
+                blockWorld.setGlobalLight(globalLight);
             }
 
             if (globalLight <= minLight || globalLight >= maxLight) {
-                 this.fadingSky = !this.fadingSky;
+                this.fadingSky = !this.fadingSky;
+            }
+
+            if (!this.currentlyNight && globalLight <= this.nightLimit) {
+                this.currentlyNight = true;
+                this.setChanged();
+                this.notifyObservers(this.currentlyNight);
+            } else if (this.currentlyNight) {
+                this.currentlyNight = false;
+                this.setChanged();
+                this.notifyObservers(this.currentlyNight);
             }
 
             this.previousState = currentState;
@@ -157,7 +169,7 @@ public class Game implements ArdorCraftGame {
     public void init(final Node root, final CanvasRelayer canvas, final LogicalLayer logicalLayer, final PhysicalLayer physicalLayer, final MouseManager mouseManager) {
         this.root = root;
         this.canvas = canvas;
-        
+
         try {
             final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
                     Game.class, "com/ardorcraft/resources"));
@@ -168,15 +180,6 @@ public class Game implements ArdorCraftGame {
         }
 
         canvas.setTitle("Les Titouz 3.0");
-
-        final SelectDialog dialog = new SelectDialog();
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-        
-        final String texture = dialog.getSelectedTexture();
-        final int textureTileSize = dialog.getSelectedTextureSize();
-        final int gridSize = dialog.getViewDistance();
 
         farPlane = (gridSize - 1) / 2 * tileSize;
 
@@ -192,22 +195,24 @@ public class Game implements ArdorCraftGame {
 
         // Create main blockworld handler
         final WorldSettings settings = new WorldSettings();
-
-        // Here you can load any terrain texture you wish (should contain 16x16 tiles).
-        // Just make sure you set the correct tilesize, that is, the subtexture size in pixels.
-        settings.setTerrainTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, texture));
-        settings.setTerrainTextureTileSize(textureTileSize);
-
         settings.setWaterTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "water.png"));
         settings.setTileSize(tileSize);
         settings.setTileHeight(height);
         settings.setGridSize(gridSize);
 
-        final IServerConnection serverConnection = new GameLocalServerConnection(new GameServerDataHandler(tileSize, height, gridSize, new LabyrintheGenerator(), null));
+        if (this.showHD) {
+            settings.setTerrainTextureTileSize(64);
+            settings.setTerrainTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "terrainHD64.png"));
+        } else {
+            settings.setTerrainTextureTileSize(16);
+            settings.setTerrainTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "terrainQ.png"));
+        }
+
+        final IServerConnection serverConnection = new GameLocalServerConnection(new GameServerDataHandler(tileSize, height, gridSize, generator, null));
         settings.setServerConnection(serverConnection);
 
         blockWorld = new BlockWorld(settings);
-        
+
         // Set block 45 (brickblock) to be a pyramid drawn with the meshproducer
         final BlockUtil blockUtil = blockWorld.getBlockUtil();
         final int blockId = 45;
@@ -242,6 +247,8 @@ public class Game implements ArdorCraftGame {
         updateLighting();
 
         blockWorld.startThreads();
+
+        this.addObserver((java.util.Observer) this.generator);
     }
 
     private void updateLighting() {
@@ -288,5 +295,6 @@ public class Game implements ArdorCraftGame {
     }
 
     @Override
-    public void resize(final int newWidth, final int newHeight) {}
+    public void resize(final int newWidth, final int newHeight) {
+    }
 }
