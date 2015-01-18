@@ -37,6 +37,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.scenegraph.shape.Pyramid;
+import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -87,6 +88,8 @@ public class Game implements ArdorCraftGame {
     private boolean currentlyNight = false;
 
     private BlockWorld blockWorld;
+	
+    private Node textNode;
     private double farPlane = 10000.0;
 
     private CanvasRelayer canvas;
@@ -227,6 +230,10 @@ public class Game implements ArdorCraftGame {
         selectionBox.setRenderState(ws);
         selectionBox.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         root.attachChild(selectionBox);
+		
+		textNode = new Node("text");
+        root.attachChild(textNode);
+		createText("HEY", 50	, 50);
 
         updateLighting();
 
@@ -299,5 +306,12 @@ public class Game implements ArdorCraftGame {
         settings.setServerConnection(serverConnection);
 
         blockWorld = new BlockWorld(settings);
+    }
+	
+	private void createText(final String text, final int x, final int y) {
+        final BasicText info = BasicText.createDefaultTextLabel("Text2", text, 16);
+        info.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        info.setTranslation(new Vector3(x, y, 0));
+        textNode.attachChild(info);
     }
 }
