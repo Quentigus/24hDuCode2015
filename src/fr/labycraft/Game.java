@@ -52,8 +52,10 @@ import com.ardorcraft.objects.SkyDome;
 import com.ardorcraft.player.PlayerWithPhysics;
 import com.ardorcraft.util.BlockUtil;
 import com.ardorcraft.util.geometryproducers.MeshProducer;
+import com.ardorcraft.world.BlockSide;
 import com.ardorcraft.world.BlockType;
 import com.ardorcraft.world.BlockWorld;
+import com.ardorcraft.world.Chunk;
 import com.ardorcraft.world.IServerConnection;
 import com.ardorcraft.world.WorldSettings;
 import fr.labycraft.generators.LabyrintheGenerator;
@@ -64,9 +66,9 @@ import java.util.Date;
 /**
  * A bigger example that will grow over time...
  */
-public class Game extends java.util.Observable implements ArdorCraftGame {
+public class Game implements ArdorCraftGame {
 
-    private final long cycle = 10000;
+    private final long cycle = 2000;//10000;
     private float globalLight = 1f;
     private final float minLight = .2f;
     private final float maxLight = 1f;
@@ -76,7 +78,7 @@ public class Game extends java.util.Observable implements ArdorCraftGame {
     private final ColorRGBA fogColor = new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
     private final ColorRGBA topColor = new ColorRGBA(0.5f, 0.6f, 1.0f, 1.0f);
 
-    private final DataGenerator generator = new LabyrintheGenerator();
+    private final LabyrintheGenerator generator = new LabyrintheGenerator();
 
     private final int tileSize = 16;
     private final int gridSize = 20;
@@ -139,12 +141,13 @@ public class Game extends java.util.Observable implements ArdorCraftGame {
 
             if (!this.currentlyNight && globalLight <= this.nightLimit) {
                 this.currentlyNight = true;
-                this.setChanged();
-                this.notifyObservers(this.currentlyNight);
+                this.generator.generatePorte(blockWorld);
+                
             } else if (this.currentlyNight && globalLight > this.nightLimit) {
                 this.currentlyNight = false;
-                this.setChanged();
-                this.notifyObservers(this.currentlyNight);
+               
+                this.generator.generateLabyrinthe();
+                this.generator.generateLabyrinthe(blockWorld);
             }
 
             this.previousState = currentState;
@@ -188,30 +191,13 @@ public class Game extends java.util.Observable implements ArdorCraftGame {
 
         // Create player object
         player = new PlayerWithPhysics(logicalLayer);
-        player.getPosition().set(50, 0, 50);
+        player.getPosition().set(25, 70, 26);
         player.setWalking(true);
 
         registerTriggers(logicalLayer, mouseManager);
 
         // Create main blockworld handler
-        final WorldSettings settings = new WorldSettings();
-        settings.setWaterTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "water.png"));
-        settings.setTileSize(tileSize);
-        settings.setTileHeight(height);
-        settings.setGridSize(gridSize);
-
-        if (this.showHD) {
-            settings.setTerrainTextureTileSize(64);
-            settings.setTerrainTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "terrainHD64.png"));
-        } else {
-            settings.setTerrainTextureTileSize(16);
-            settings.setTerrainTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "terrainQ.png"));
-        }
-
-        final IServerConnection serverConnection = new GameLocalServerConnection(new GameServerDataHandler(tileSize, height, gridSize, generator, null));
-        settings.setServerConnection(serverConnection);
-
-        blockWorld = new BlockWorld(settings);
+        createBlockWorld();
 
         // Set block 45 (brickblock) to be a pyramid drawn with the meshproducer
         final BlockUtil blockUtil = blockWorld.getBlockUtil();
@@ -247,8 +233,6 @@ public class Game extends java.util.Observable implements ArdorCraftGame {
         updateLighting();
 
         blockWorld.startThreads();
-
-        this.addObserver((java.util.Observer) this.generator);
     }
 
     private void updateLighting() {
@@ -296,5 +280,26 @@ public class Game extends java.util.Observable implements ArdorCraftGame {
 
     @Override
     public void resize(final int newWidth, final int newHeight) {
+    }
+
+    private void createBlockWorld() {
+        final WorldSettings settings = new WorldSettings();
+        settings.setWaterTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "water.png"));
+        settings.setTileSize(tileSize);
+        settings.setTileHeight(height);
+        settings.setGridSize(gridSize);
+
+        if (this.showHD) {
+            settings.setTerrainTextureTileSize(64);
+            settings.setTerrainTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "terrainHD64.png"));
+        } else {
+            settings.setTerrainTextureTileSize(16);
+            settings.setTerrainTexture(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, "terrainQ.png"));
+        }
+
+        final IServerConnection serverConnection = new GameLocalServerConnection(new GameServerDataHandler(tileSize, height, gridSize, (DataGenerator)generator, null));
+        settings.setServerConnection(serverConnection);
+
+        blockWorld = new BlockWorld(settings);
     }
 }

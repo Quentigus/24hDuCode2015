@@ -85,7 +85,7 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
         }
     }
     
-    private void generateLabyrinthe(){
+    public void generateLabyrinthe(){
         MazeGenerator maze = new Labyrinthe(26, 26);
         maze.carveSafeZone(12, 12);
         maze.generate();
@@ -117,6 +117,31 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
     }
     
     private void addTree(final WorldModifier blockScene, final Pos pos, final int treeHeight, final Random rand) {
+        for (int y = 0; y < treeHeight; y++) {
+            blockScene.setBlock(pos.x, pos.y + y, pos.z, 17);
+        }
+        
+        for (int x = 0; x < treeHeight; x++) {
+            for (int z = 0; z < treeHeight; z++) {
+                for (int y = 0; y < treeHeight; y++) {
+                    final int xx = x - (treeHeight - 1) / 2;
+                    final int yy = y - (treeHeight - 1) / 2;
+                    final int zz = z - (treeHeight - 1) / 2;
+                    if (xx == 0 && zz == 0 && yy <= 0) {
+                        continue;
+                    }
+                    final double test = MathUtils.sqrt((double) xx * xx + yy * yy + zz * zz);
+                    if (test < (treeHeight - 1.0) / 2.0) {
+                        if (rand.nextDouble() < 0.8) {
+                            blockScene.setBlock(pos.x + xx, pos.y + yy + treeHeight - 1, pos.z + zz, 18);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private void addTree(final BlockWorld blockScene, final Pos pos, final int treeHeight, final Random rand) {
         for (int y = 0; y < treeHeight; y++) {
             blockScene.setBlock(pos.x, pos.y + y, pos.z, 17);
         }
@@ -301,6 +326,46 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
                 }
             }
              
+    }
+
+    public void generateLabyrinthe(BlockWorld blockWorld) {
+        for (int x = 0;x < tab.length;x++) {
+            for (int y = 0;y < tab[0].length;y++) {
+                
+                if (x >= 0 && x < tab.length
+                        &&y >= 0 && y < tab[0].length) {
+                    int z = 0;
+                    Random rand1 = new Random();
+                    if (tab[x][y] == 1) {
+                        for(int k = 1;k<rand1.nextInt(6)+7;k++){
+                            blockWorld.setBlock(x, k, y, 1);
+                        }
+                    }
+                    if (tab[x][y] == 4) {
+                        for(int k = 1;k<11;k++){
+                            blockWorld.setBlock(x, k, y, 1);
+                        }
+                    }
+                    if (tab[x][y] == 5) {
+                        for(int k = 1;k<11;k++){
+                            blockWorld.setBlock(x, k, y, 2);
+                        }
+                    }
+                    if (tab[x][y] == 2 || tab[x][y]== 0) {
+                        blockWorld.setBlock(x, 1, y, 2);
+                    }
+                    if (tab[x][y] == 3) {
+                        
+                        //for (int k = 0; k < 5; k++) {
+                        //   proxy.setBlock(x, k, y, 17);
+                        //}
+                        Pos p = new Pos(x, 0, y);
+                        Random rand = new Random();
+                        addTree(blockWorld, p, 10, rand);
+                    }
+                }
+            }
+        }
     }
     
 }
