@@ -56,6 +56,7 @@ import com.ardorcraft.world.BlockType;
 import com.ardorcraft.world.BlockWorld;
 import com.ardorcraft.world.IServerConnection;
 import com.ardorcraft.world.WorldSettings;
+import fr.labycraft.Modele.Monstre;
 import fr.labycraft.generators.LabyrintheGenerator;
 import fr.labycraft.network.GameLocalServerConnection;
 import fr.labycraft.network.GameServerDataHandler;
@@ -140,6 +141,7 @@ public class Game implements ArdorCraftGame {
             if (!this.currentlyNight && globalLight <= this.nightLimit) {
                 this.currentlyNight = true;
                 this.generator.generatePorte(blockWorld);
+                Monstre m = new Monstre(1, 1, 1, blockWorld);
                 
             } else if (this.currentlyNight && globalLight > this.nightLimit) {
                 this.currentlyNight = false;
