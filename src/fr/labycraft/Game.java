@@ -148,6 +148,7 @@ public class Game implements ArdorCraftGame {
                
                 this.generator.generateLabyrinthe();
                 this.generator.generateLabyrinthe(blockWorld);
+                this.generator.suppressionPorte(blockWorld);
             }
 
             this.previousState = currentState;
