@@ -25,7 +25,7 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
     
     private static final int waterHeight = 0;
     
-    private int[][] tab = new int[50][50];
+    private int[][] tab;
 
     @Override
     public void update(Observable o, Object arg) {
