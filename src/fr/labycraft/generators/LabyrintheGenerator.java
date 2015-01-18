@@ -85,7 +85,7 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
         }
     }
     
-    private void generateLabyrinthe(){
+    public void generateLabyrinthe(){
         MazeGenerator maze = new Labyrinthe(26, 26);
         maze.carveSafeZone(12, 12);
         maze.generate();
@@ -298,6 +298,19 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
                     blockWorld.setBlock(startx+24, h, starty+l, 3);
                     blockWorld.setBlock(startx+l, h, starty, 3);
                     blockWorld.setBlock(startx+l, h, starty+24, 3);
+                }
+            }
+             
+    }
+    
+    public void suppressionPorte(BlockWorld blockWorld){
+        //generateLabyrinthe();
+            for(int l = 12; l<15;l++){
+                for(int h = 2;h<11;h++){
+                    blockWorld.setBlock(startx, h, starty+l, 0);
+                    blockWorld.setBlock(startx+24, h, starty+l, 0);
+                    blockWorld.setBlock(startx+l, h, starty, 0);
+                    blockWorld.setBlock(startx+l, h, starty+24, 0);
                 }
             }
              
