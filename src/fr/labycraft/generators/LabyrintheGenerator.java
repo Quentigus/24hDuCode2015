@@ -16,15 +16,18 @@ import java.util.Random;
  * @author Bastien Andru <bastien.andru@gmail.com>
  */
 public class LabyrintheGenerator implements DataGenerator{
-
+    
+    public LabyrintheGenerator(){
+        generateLabyrinthe();
+    }
     
     private static final int waterHeight = 0;
+    
     
     private int[][] tab;
     
     @Override
     public void generateChunk(int xStart, int zStart, int xEnd, int zEnd, int spacing, int height, WorldModifier proxy) {
-        generateLabyrinthe();
         for (int x = xStart;x < xEnd;x++) {
             for (int y = zStart;y < zEnd;y++) {
                 
@@ -48,11 +51,11 @@ public class LabyrintheGenerator implements DataGenerator{
                     if (tab[x][y] == 3) {
                         
                         //for (int k = 0; k < 5; k++) {
-                         //   proxy.setBlock(x, k, y, 17);
+                        //   proxy.setBlock(x, k, y, 17);
                         //}
                         Pos p = new Pos(x, 0, y);
                         Random rand = new Random();
-                        addTree(proxy, p, 20, rand);
+                        addTree(proxy, p, 10, rand);
                     }
                 }
             }
@@ -60,9 +63,10 @@ public class LabyrintheGenerator implements DataGenerator{
     }
     
     private void generateLabyrinthe(){
-        MazeGenerator maze = new Labyrinthe(50, 50);
+        MazeGenerator maze = new Labyrinthe(26, 26);
         maze.carveSafeZone(12, 12);
         maze.generate();
+        maze.printBoolean();
         tab = maze.getMazeBool();
         safeZone();
     }
@@ -77,9 +81,16 @@ public class LabyrintheGenerator implements DataGenerator{
                 }else{
                     tab[i][j] = 2;
                 }
-                //tab[25][25] = 3;
+                tab[startx+12][starty+13] = 3;
             }
         }
+        for(int l = 12; l<15;l++){
+            tab[startx][starty+l] = 0;
+            tab[startx+24][starty+l] = 0;
+            tab[startx+l][starty] = 0;
+            tab[startx+l][starty+24] = 0;
+        }
+        
     }
     
     private void addTree(final WorldModifier blockScene, final Pos pos, final int treeHeight, final Random rand) {
