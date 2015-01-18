@@ -221,5 +221,7 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
                 }
             }
         }
-    }    
+    }  
+    
+
 }
