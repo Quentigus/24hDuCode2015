@@ -6,6 +6,8 @@ import com.ardorcraft.generators.DataGenerator;
 import com.ardorcraft.util.ImprovedNoise;
 import com.ardorcraft.world.BlockWorld;
 import com.ardorcraft.world.WorldModifier;
+import fr.labycraft.Modele.Labyrinthe;
+import fr.labycraft.Modele.MazeGenerator;
 import java.util.List;
 import java.util.Random;
 
@@ -18,23 +20,29 @@ public class LabyrintheGenerator implements DataGenerator{
     
     private static final int waterHeight = 0;
     
-    private int[][] tab = new int[50][50];
+    private int[][] tab;
     
     @Override
     public void generateChunk(int xStart, int zStart, int xEnd, int zEnd, int spacing, int height, WorldModifier proxy) {
-        safeZone();
+        generateLabyrinthe();
         for (int x = xStart;x < xEnd;x++) {
             for (int y = zStart;y < zEnd;y++) {
                 
                 if (x >= 0 && x < tab.length
                         &&y >= 0 && y < tab[0].length) {
                     int z = 0;
+                    Random rand1 = new Random();
                     if (tab[x][y] == 1) {
-                        for(int k = 1;k<10;k++){
+                        for(int k = 1;k<rand1.nextInt(6)+7;k++){
                             proxy.setBlock(x, k, y, 1);
                         }
                     }
-                    if (tab[x][y] == 2) {
+                    if (tab[x][y] == 4) {
+                        for(int k = 1;k<11;k++){
+                            proxy.setBlock(x, k, y, 1);
+                        }
+                    }
+                    if (tab[x][y] == 2 || tab[x][y]== 0) {
                         proxy.setBlock(x, 1, y, 2);
                     }
                     if (tab[x][y] == 3) {
@@ -51,15 +59,25 @@ public class LabyrintheGenerator implements DataGenerator{
         }
     }
     
+    private void generateLabyrinthe(){
+        MazeGenerator maze = new Labyrinthe(50, 50);
+        maze.carveSafeZone(12, 12);
+        maze.generate();
+        tab = maze.getMazeBool();
+        safeZone();
+    }
+    
     private void safeZone(){
-        for (int i = 0; i<50;i++){
-            for (int j = 0;j<50;j++){
-                if (i == 0 || j == 0 || i == 49 || j == 49){
-                    tab[i][j] = 1;
+        int startx = Math.round((tab.length - 25)/ 2);
+        int starty = Math.round((tab[0].length - 25)/ 2);
+        for (int i = startx; i<(startx+25);i++){
+            for (int j = starty;j<(starty+25);j++){
+                if (i == startx || j == starty || i == startx+24 || j == starty+24){
+                    tab[i][j] = 4;
                 }else{
                     tab[i][j] = 2;
                 }
-                tab[25][25] = 3;
+                //tab[25][25] = 3;
             }
         }
     }
