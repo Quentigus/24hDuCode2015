@@ -26,10 +26,22 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
     private static final int waterHeight = 0;
     
     private int[][] tab;
-
+    private int startx;
+    private int starty;
+    
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println("génération");
+        if ((boolean)arg){
+            //generateLabyrinthe();
+            for(int l = 12; l<15;l++){
+                tab[startx][starty+l] = 5;
+                tab[startx+24][starty+l] = 5;
+                tab[startx+l][starty] = 5;
+                tab[startx+l][starty+24] = 5;
+            }
+        }/*else{
+            generateLabyrinthe();
+        }*/
     }
     
     @Override
@@ -49,6 +61,11 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
                     if (tab[x][y] == 4) {
                         for(int k = 1;k<11;k++){
                             proxy.setBlock(x, k, y, 1);
+                        }
+                    }
+                    if (tab[x][y] == 5) {
+                        for(int k = 1;k<11;k++){
+                            proxy.setBlock(x, k, y, 2);
                         }
                     }
                     if (tab[x][y] == 2 || tab[x][y]== 0) {
@@ -78,8 +95,8 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
     }
     
     private void safeZone(){
-        int startx = Math.round((tab.length - 25)/ 2);
-        int starty = Math.round((tab[0].length - 25)/ 2);
+        startx = Math.round((tab.length - 25)/ 2);
+        starty = Math.round((tab[0].length - 25)/ 2);
         for (int i = startx; i<(startx+25);i++){
             for (int j = starty;j<(starty+25);j++){
                 if (i == startx || j == starty || i == startx+24 || j == starty+24){
@@ -272,4 +289,18 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
         
         return startheight + localHeight;
     }
+    
+    public void generatePorte(BlockWorld blockWorld){
+        //generateLabyrinthe();
+            for(int l = 12; l<15;l++){
+                for(int h = 0;h<11;h++){
+                    blockWorld.setBlock(startx, h, starty+l, 3);
+                    blockWorld.setBlock(startx+24, h, starty+l, 3);
+                    blockWorld.setBlock(startx+l, h, starty, 3);
+                    blockWorld.setBlock(startx+l, h, starty+24, 3);
+                }
+            }
+             
+    }
+    
 }
