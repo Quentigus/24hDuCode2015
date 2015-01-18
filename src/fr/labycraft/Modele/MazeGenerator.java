@@ -59,7 +59,7 @@ public abstract class MazeGenerator {
 		return ind;
 	}
 
-	private void carveSafeZone(int safeWidth, int safeHeigth) {
+	public void carveSafeZone(int safeWidth, int safeHeigth) {
 		Point topLeft = new Point();
 		Point topRight = new Point();
 		Point bottomLeft = new Point();
@@ -444,5 +444,9 @@ public abstract class MazeGenerator {
 		}
 		System.out.println(buff.toString());
 	}
+        
+        public int[][] getMazeBool(){
+            return mazeBool;
+        }
 
 }
