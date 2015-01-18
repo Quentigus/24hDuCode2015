@@ -39,9 +39,9 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
                 tab[startx+l][starty] = 5;
                 tab[startx+l][starty+24] = 5;
             }
-        }else{
+        }/*else{
             generateLabyrinthe();
-        }
+        }*/
     }
     
     @Override
@@ -289,4 +289,18 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
         
         return startheight + localHeight;
     }
+    
+    public void generatePorte(BlockWorld blockWorld){
+        //generateLabyrinthe();
+            for(int l = 12; l<15;l++){
+                for(int h = 0;h<11;h++){
+                    blockWorld.setBlock(startx, h, starty+l, 3);
+                    blockWorld.setBlock(startx+24, h, starty+l, 3);
+                    blockWorld.setBlock(startx+l, h, starty, 3);
+                    blockWorld.setBlock(startx+l, h, starty+24, 3);
+                }
+            }
+             
+    }
+    
 }
