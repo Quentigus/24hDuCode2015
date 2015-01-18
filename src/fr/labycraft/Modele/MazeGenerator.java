@@ -23,8 +23,8 @@ public abstract class MazeGenerator {
 		maze.carveSafeZone(4, 8);
 		maze.print(System.out);
 		maze.generate();
-		maze.print(System.out);
-		maze.printBoolean();
+		//maze.print(System.out);
+		//maze.printBoolean();
 	}
 
 	/** Represents UP. */

@@ -42,7 +42,7 @@ public class GameGeneratorViewer {
     private static final Logger logger = Logger.getLogger(GameGeneratorViewer.class.getName());
 
     public static void main(final String[] args) {
-		new GameGeneratorViewer(new LabyrintheGenerator() , 32, 150, 16);
+        new GameGeneratorViewer(new LabyrintheGenerator() , 32, 150, 16);
     }
 
     private int spacing = 1;

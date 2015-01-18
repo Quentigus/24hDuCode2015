@@ -52,10 +52,8 @@ import com.ardorcraft.objects.SkyDome;
 import com.ardorcraft.player.PlayerWithPhysics;
 import com.ardorcraft.util.BlockUtil;
 import com.ardorcraft.util.geometryproducers.MeshProducer;
-import com.ardorcraft.world.BlockSide;
 import com.ardorcraft.world.BlockType;
 import com.ardorcraft.world.BlockWorld;
-import com.ardorcraft.world.Chunk;
 import com.ardorcraft.world.IServerConnection;
 import com.ardorcraft.world.WorldSettings;
 import fr.labycraft.generators.LabyrintheGenerator;
@@ -148,7 +146,6 @@ public class Game implements ArdorCraftGame {
                
                 this.generator.generateLabyrinthe();
                 this.generator.generateLabyrinthe(blockWorld);
-                this.generator.suppressionPorte(blockWorld);
             }
 
             this.previousState = currentState;

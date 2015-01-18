@@ -41,7 +41,7 @@ public class GeneratorViewer {
     private static final Logger logger = Logger.getLogger(GeneratorViewer.class.getName());
 
     public static void main(final String[] args) {
-		new GeneratorViewer(new LabyrintheGenerator() , 32, 150, 16);
+		//new GeneratorViewer(new LabyrintheGenerator() , 32, 150, 16);
     }
 
     private int spacing = 1;
