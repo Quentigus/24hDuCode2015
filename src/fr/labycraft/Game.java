@@ -141,7 +141,7 @@ public class Game extends java.util.Observable implements ArdorCraftGame {
                 this.currentlyNight = true;
                 this.setChanged();
                 this.notifyObservers(this.currentlyNight);
-            } else if (this.currentlyNight) {
+            } else if (this.currentlyNight && globalLight > this.nightLimit) {
                 this.currentlyNight = false;
                 this.setChanged();
                 this.notifyObservers(this.currentlyNight);
