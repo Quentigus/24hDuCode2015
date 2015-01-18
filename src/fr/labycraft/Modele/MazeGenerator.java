@@ -11,9 +11,12 @@ import java.util.Random;
  *
  */
 public abstract class MazeGenerator {
-	
+
 	public int safeWidth;
+
 	public int safeHeigth;
+
+	private int posSortieX;
 
 	public static void main(String[] args) {
 		MazeGenerator maze = new Labyrinthe(12, 10);
@@ -47,8 +50,9 @@ public abstract class MazeGenerator {
 
 	private int[][] mazeBool;
 
-	private void percerEntreeSortieBool() {
-		mazeBool[generateRandIndLargeur()][0] = 0;
+	private void percerSortieBool() {
+		posSortieX = generateRandIndLargeur();
+		mazeBool[posSortieX][mazeBool[0].length -1] = 0;
 	}
 
 	private int generateRandIndLargeur() {
@@ -67,7 +71,7 @@ public abstract class MazeGenerator {
 
 		this.safeWidth = safeWidth;
 		this.safeHeigth = safeHeigth;
-		
+
 		topLeft.setLocation((width / 2) - (safeWidth / 2), (height / 2) - safeHeigth / 2);
 
 		topRight.setLocation(((width / 2) + (safeWidth / 2)) - 1, (height / 2) - safeHeigth / 2);
@@ -162,7 +166,7 @@ public abstract class MazeGenerator {
 	public final void generate() {
 		generateMaze();
 		convertToBoolean();
-		percerEntreeSortieBool();
+		percerSortieBool();
 	}
 
 	/**
@@ -444,9 +448,13 @@ public abstract class MazeGenerator {
 		}
 		System.out.println(buff.toString());
 	}
-        
-        public int[][] getMazeBool(){
-            return mazeBool;
-        }
+
+	public int[][] getMazeBool() {
+		return mazeBool;
+	}
+
+	public int getPosSortieX() {
+		return posSortieX;
+	}
 
 }

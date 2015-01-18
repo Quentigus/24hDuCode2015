@@ -368,4 +368,17 @@ public class LabyrintheGenerator implements DataGenerator, Observer {
         }
     }
     
+    public void suppressionPorte(BlockWorld blockWorld){
+        //generateLabyrinthe();
+            for(int l = 12; l<15;l++){
+                for(int h = 2;h<11;h++){
+                    blockWorld.setBlock(startx, h, starty+l, 0);
+                    blockWorld.setBlock(startx+24, h, starty+l, 0);
+                    blockWorld.setBlock(startx+l, h, starty, 0);
+                    blockWorld.setBlock(startx+l, h, starty+24, 0);
+                }
+            }
+             
+    }
+    
 }
